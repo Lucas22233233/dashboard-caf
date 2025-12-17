@@ -1,0 +1,69 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.filtro {
+  margin-bottom: 15px;
+}
+
+button {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: white;
+}
+
+th {
+  background: #2f2f2f;
+  color: white;
+  padding: 8px;
+  font-size: 14px;
+}
+
+td {
+  text-align: center;
+  padding: 6px;
+  border: 1px solid #ccc;
+}
+
+/* CORES DE META */
+.green {
+  background: #c8f7c5;
+  color: #006400;
+  font-weight: bold;
+}
+
+.yellow {
+  background: #fff3b0;
+  color: #9c7c00;
+  font-weight: bold;
+}
+
+.red {
+  background: #f7c5c5;
+  color: #8b0000;
+  font-weight: bold;
+}
+
+/* HORA EXTRA */
+.extra {
+  background: #d9d9d9 !important;
+  color: #000;
+  font-weight: bold;
+}
+
+/* TOTAL */
+tfoot td {
+  background: #efefef;
+  font-weight: bold;
+}

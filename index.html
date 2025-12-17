@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Produção por QR Code</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Produção por QR Code</h2>
+
+<div class="filtro">
+  <label>Selecione a data:</label>
+  <input type="date" id="data">
+  <button onclick="buscar()">Buscar</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>CÉLULA</th>
+      <th>1H</th>
+      <th>2H</th>
+      <th>3H</th>
+      <th>4H</th>
+      <th>5H</th>
+      <th>6H</th>
+      <th>7H</th>
+      <th>8H</th>
+      <th>9H</th>
+      <th class="extra">HORA EXTRA</th>
+      <th>Total</th>
+      <th>Tendência</th>
+      <th>% Cap.</th>
+      <th>Desvio</th>
+    </tr>
+  </thead>
+
+  <tbody id="tabela"></tbody>
+
+  <tfoot>
+    <tr id="totais"></tr>
+  </tfoot>
+</table>
+
+<script src="script.js"></script>
+</body>
+</html>
