@@ -1,69 +1,135 @@
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  padding: 20px;
+  background: linear-gradient(135deg, #e8f5e9, #ffffff);
 }
 
-h2 {
+/* HEADER */
+.header {
+  background: linear-gradient(90deg, #1b5e20, #2e7d32);
+  color: white;
+  padding: 15px 30px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.logo .amb {
+  color: #ffffff;
+}
+
+.logo .bag {
+  color: #a5d6a7;
+}
+
+.titulo h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.titulo p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* CONTAINER */
+.container {
+  padding: 15px 20px;
+}
+
+/* TOPO */
+.topo {
   margin-bottom: 10px;
 }
 
-.filtro {
-  margin-bottom: 15px;
+.topo label {
+  font-size: 14px;
+  margin-right: 5px;
 }
 
-button {
-  padding: 6px 12px;
+.topo input,
+.topo button {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+.topo button {
+  background: #2e7d32;
+  color: white;
+  border: none;
   cursor: pointer;
+  border-radius: 3px;
 }
 
+.topo button:hover {
+  background: #1b5e20;
+}
+
+/* TABELA */
 table {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
   background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 th {
-  background: #2f2f2f;
+  background: #2b2b2b;
   color: white;
   padding: 8px;
+  border: 1px solid #000;
   font-size: 14px;
 }
 
 td {
   text-align: center;
   padding: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
+  font-size: 13px;
 }
 
-/* CORES DE META */
-.green {
-  background: #c8f7c5;
-  color: #006400;
-  font-weight: bold;
-}
-
-.yellow {
-  background: #fff3b0;
-  color: #9c7c00;
-  font-weight: bold;
-}
-
-.red {
-  background: #f7c5c5;
-  color: #8b0000;
-  font-weight: bold;
-}
-
-/* HORA EXTRA */
-.extra {
-  background: #d9d9d9 !important;
+/* CORES */
+.verde {
+  background-color: #c8f7c5;
   color: #000;
   font-weight: bold;
 }
 
-/* TOTAL */
-tfoot td {
-  background: #efefef;
+.amarelo {
+  background-color: #fff3b0;
+  color: #000;
   font-weight: bold;
+}
+
+.vermelho {
+  background-color: #f7c5c5;
+  color: #000;
+  font-weight: bold;
+}
+
+/* HORA EXTRA */
+.hora-extra,
+td.extra {
+  min-width: 55px;
+  width: 55px;
+  max-width: 55px;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 20px;
+  padding: 10px;
+  text-align: center;
+  font-size: 12px;
+  background: #f2f2f2;
+  color: #333;
 }
