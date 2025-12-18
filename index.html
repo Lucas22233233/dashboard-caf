@@ -1,47 +1,76 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Produção por QR Code</title>
+  <title>Dashboard da Produção - CAF</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Produção por QR Code</h2>
+<!-- HEADER -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">
+      <span class="amb">AMB</span><span class="bag">BAG</span>
+    </div>
+    <div class="titulo">
+      <h1>Dashboard da Produção</h1>
+      <p>Controle Operacional · CAF</p>
+    </div>
+  </div>
+</header>
 
-<div class="filtro">
-  <label>Selecione a data:</label>
-  <input type="date" id="data">
-  <button onclick="buscar()">Buscar</button>
-</div>
+<!-- CONTEÚDO -->
+<main class="container">
 
-<table>
-  <thead>
-    <tr>
-      <th>CÉLULA</th>
-      <th>1H</th>
-      <th>2H</th>
-      <th>3H</th>
-      <th>4H</th>
-      <th>5H</th>
-      <th>6H</th>
-      <th>7H</th>
-      <th>8H</th>
-      <th>9H</th>
-      <th class="extra">HORA EXTRA</th>
-      <th>Total</th>
-      <th>Tendência</th>
-      <th>% Cap.</th>
-      <th>Desvio</th>
-    </tr>
-  </thead>
+  <div class="topo">
+    <label>Selecionar data:</label>
+    <input type="date" id="data">
+    <button onclick="buscar()">Buscar</button>
+  </div>
 
-  <tbody id="tabela"></tbody>
+  <table>
+    <thead>
+      <tr>
+        <th>CÉLULA</th>
+        <th>1H</th>
+        <th>2H</th>
+        <th>3H</th>
+        <th>4H</th>
+        <th>5H</th>
+        <th>6H</th>
+        <th>7H</th>
+        <th>8H</th>
+        <th>9H</th>
+        <th class="hora-extra">HORA EXTRA</th>
+        <th>Total</th>
+        <th>Tendência</th>
+        <th>% Cap.</th>
+        <th>Desvio</th>
+      </tr>
+    </thead>
 
-  <tfoot>
-    <tr id="totais"></tr>
-  </tfoot>
-</table>
+    <tbody id="tbody"></tbody>
+
+    <tfoot>
+      <tr id="total-geral">
+        <td><b>TOTAL</b></td>
+        <td colspan="14"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  Dashboard desenvolvido por <b>TechCore</b> · Soluções Inteligentes em Tecnologia
+</footer>
 
 <script src="script.js"></script>
 </body>
