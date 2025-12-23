@@ -11,73 +11,74 @@ firebase.initializeApp(firebaseConfig);
 // =======================
 const META_HORA = 50;
 const META_DIA = 440;
+const TOTAL_HORAS_DIA = 9;
+
+// Horas válidas do turno
+const MAPA_HORAS = [7,8,9,10,11,13,14,15,16];
 
 // =======================
-// HORAS
+// UTIL
 // =======================
-const HORAS = [
-  ['"07:'], ['"08:'], ['"09:'], ['"10:'],
-  ['"11:'], ['"12:'], ['"13:'], ['"14:'],
-  ['"15:']
-];
-
-// =======================
-// HORA EXTRA
-// =======================
-const HORA_EXTRA = [
-  '"16:','"17:','"18:','"19:','"20:','"21:','"22:','"23:'
-];
-
-// =======================
-// UTIL SEGURO
-// =======================
-function num(v) {
-  v = Number(v);
-  return isNaN(v) ? 0 : v;
+function cor(v, m) {
+  return v >= m ? "verde" : "vermelho";
 }
 
-function cor(valor, meta) {
-  return valor >= meta ? "verde" : "vermelho";
-}
-
-function corHora(valor, meta) {
-  if (valor >= meta) return "verde";
-  if (valor >= meta * 0.8) return "amarelo";
+function corHora(v, m) {
+  if (v >= m) return "verde";
+  if (v >= m * 0.8) return "amarelo";
   return "vermelho";
 }
 
-function formatarData(data) {
-  if (!data) return "";
-  const [a,m,d] = data.split("-");
-  return `${d}-${m}-${a}`;
-}
-
-function dataHoje() {
+function hojeISO() {
   return new Date().toISOString().split("T")[0];
 }
 
+function formatarData(d) {
+  const [a,m,dd] = d.split("-");
+  return `${dd}-${m}-${a}`;
+}
+
 // =======================
-// IDENTIFICAÇÃO
+// IDENTIFICA HORA
 // =======================
 function identificarHora(txt) {
-  for (let i = 0; i < HORAS.length; i++) {
-    if (HORAS[i].some(h => txt.includes(h))) return i;
-  }
+  const m = txt.match(/"(\d{2}):(\d{2})/);
+  if (!m) return -1;
+
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+
+  if (h === 7) return 0;
+  if (h === 8) return 1;
+  if (h === 9) return 2;
+  if (h === 10) return 3;
+  if (h === 11 || h === 12) return 4;
+  if (h === 13) return 5;
+  if (h === 14) return 6;
+  if (h === 15) return 7;
+  if (h === 16 && min <= 47) return 8;
+
   return -1;
 }
 
 function identificarHoraExtra(txt) {
-  return HORA_EXTRA.some(h => txt.includes(h));
+  const m = txt.match(/"(\d{2}):(\d{2})/);
+  if (!m) return false;
+
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+
+  return h > 16 || (h === 16 && min >= 48);
 }
 
 // =======================
-// META DINÂMICA
+// META DINÂMICA (MINUTOS)
 // =======================
-function metaHoraAtual(indice) {
+function metaHoraDinamica(indice) {
   const agora = new Date();
   const hAtual = agora.getHours();
   const mAtual = agora.getMinutes();
-  const hTabela = 7 + indice;
+  const hTabela = MAPA_HORAS[indice];
 
   if (hTabela < hAtual) return META_HORA;
   if (hTabela > hAtual) return 0;
@@ -85,21 +86,19 @@ function metaHoraAtual(indice) {
   return Math.round((META_HORA / 60) * mAtual);
 }
 
-function metaDiaHoje() {
+function metaDiaDinamica() {
   const agora = new Date();
   const hAtual = agora.getHours();
   const mAtual = agora.getMinutes();
 
   let meta = 0;
-
-  HORAS.forEach((_, i) => {
-    const hTabela = 7 + i;
-    if (hTabela < hAtual) meta += META_HORA;
-    else if (hTabela === hAtual)
+  MAPA_HORAS.forEach(h => {
+    if (h < hAtual) meta += META_HORA;
+    else if (h === hAtual)
       meta += Math.round((META_HORA / 60) * mAtual);
   });
 
-  return num(meta);
+  return meta;
 }
 
 // =======================
@@ -111,9 +110,11 @@ const totalLinha = document.getElementById("total-geral");
 
 function criarTabela() {
   tbody.innerHTML = "";
+
   for (let i = 1; i <= 10; i++) {
     const nome = `CAF ${String(i).padStart(2,"0")}`;
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
       <td>${nome}</td>
       ${'<td>0</td>'.repeat(9)}
@@ -123,22 +124,21 @@ function criarTabela() {
       <td>0%</td>
       <td>0</td>
     `;
+
     tbody.appendChild(tr);
     linhas[nome] = tr;
   }
 }
 
 // =======================
-// BUSCAR (ANTI-NaN)
+// BUSCAR
 // =======================
 function buscar() {
-
   const dataInput = document.getElementById("data").value;
   if (!dataInput) return;
 
-  const hoje = dataHoje();
+  const hoje = hojeISO();
   const data = formatarData(dataInput);
-  const metaDia = num(dataInput === hoje ? metaDiaHoje() : META_DIA);
 
   let totalHoras = Array(9).fill(0);
   let totalExtra = 0;
@@ -155,37 +155,40 @@ function buscar() {
       .once("value")
       .then(snap => {
 
-        let horas = Array(9).fill(0);
+        const horas = Array(9).fill(0);
         let extra = 0;
 
-        const dados = snap.val() || {};
-
-        Object.values(dados).forEach(item => {
-          const txt = JSON.stringify(item || "");
+        Object.values(snap.val() || {}).forEach(item => {
+          const txt = JSON.stringify(item);
           const h = identificarHora(txt);
           if (h >= 0) horas[h]++;
           if (identificarHoraExtra(txt)) extra++;
         });
 
-        const total = num(horas.reduce((a,b)=>a+b,0));
-        const tendencia = total;
+        const total = horas.reduce((a,b)=>a+b,0);
+        const horasValidas = horas.filter(v => v > 0).length;
 
-        const capacidade = metaDia > 0
-          ? Math.round((total / metaDia) * 100)
-          : 0;
+        // =======================
+        // 🔥 TENDÊNCIA (EXCEL)
+        // =======================
+        let tendencia = 0;
+        if (horasValidas > 0) {
+          const metaDinamica = dataInput === hoje ? metaDiaDinamica() : META_DIA;
+          tendencia = Math.round((total / metaDinamica) * META_DIA);
+        }
 
-        const desvio = total - metaDia;
+        // =======================
+        // CAPACIDADE / DESVIO (POR CÉLULA)
+        // =======================
+        const capacidade = Math.round((tendencia / META_DIA) * 100);
+        const desvio = tendencia - META_DIA;
 
         const tds = tr.children;
 
         horas.forEach((v, idx) => {
-          const metaH = (dataInput === hoje)
-            ? metaHoraAtual(idx)
-            : META_HORA;
-
+          const metaH = dataInput === hoje ? metaHoraDinamica(idx) : META_HORA;
           tds[idx+1].textContent = v;
           tds[idx+1].className = corHora(v, metaH);
-
           totalHoras[idx] += v;
         });
 
@@ -193,7 +196,7 @@ function buscar() {
         tds[11].textContent = total;
 
         tds[12].textContent = tendencia;
-        tds[12].className = cor(tendencia, metaDia);
+        tds[12].className = cor(tendencia, META_DIA);
 
         tds[13].textContent = capacidade + "%";
         tds[13].className = capacidade >= 100 ? "verde" : "vermelho";
@@ -204,12 +207,22 @@ function buscar() {
         totalExtra += extra;
         totalGeral += total;
 
+        // =======================
+        // 🔥 TENDÊNCIA GERAL (PRETA)
+        // =======================
+        let tendenciaGeral = 0;
+        if (totalGeral > 0) {
+          const metaGeral = dataInput === hoje ? metaDiaDinamica() : META_DIA;
+          tendenciaGeral = Math.round((totalGeral / metaGeral) * META_DIA);
+        }
+
         totalLinha.innerHTML = `
           <td><b>TOTAL</b></td>
           ${totalHoras.map(v=>`<td>${v}</td>`).join("")}
           <td class="extra">${totalExtra}</td>
           <td>${totalGeral}</td>
-          <td></td><td></td><td></td>
+          <td class="preto">${tendenciaGeral}</td>
+          <td></td>
         `;
       });
   }
@@ -219,7 +232,7 @@ function buscar() {
 // INIT
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("data").value = dataHoje();
+  document.getElementById("data").value = hojeISO();
   criarTabela();
   buscar();
   setInterval(buscar, 5000);
