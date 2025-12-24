@@ -2,7 +2,7 @@
 // FIREBASE
 // =======================
 const firebaseConfig = {
-  databaseURL: "https://appqrcode2-default-rtdb.firebaseio.com"
+  databaseURL: "https://appqrcode-43874-default-rtdb.firebaseio.com/"
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -11,10 +11,6 @@ firebase.initializeApp(firebaseConfig);
 // =======================
 const META_HORA = 50;
 const META_DIA = 440;
-const TOTAL_HORAS_DIA = 9;
-
-// Horas válidas do turno
-const MAPA_HORAS = [7,8,9,10,11,13,14,15,16];
 
 // =======================
 // UTIL
@@ -72,12 +68,13 @@ function identificarHoraExtra(txt) {
 }
 
 // =======================
-// META DINÂMICA (MINUTOS)
+// META DINÂMICA
 // =======================
 function metaHoraDinamica(indice) {
   const agora = new Date();
   const hAtual = agora.getHours();
   const mAtual = agora.getMinutes();
+  const MAPA_HORAS = [7,8,9,10,11,13,14,15,16];
   const hTabela = MAPA_HORAS[indice];
 
   if (hTabela < hAtual) return META_HORA;
@@ -90,6 +87,7 @@ function metaDiaDinamica() {
   const agora = new Date();
   const hAtual = agora.getHours();
   const mAtual = agora.getMinutes();
+  const MAPA_HORAS = [7,8,9,10,11,13,14,15,16];
 
   let meta = 0;
   MAPA_HORAS.forEach(h => {
@@ -140,6 +138,8 @@ function buscar() {
   const hoje = hojeISO();
   const data = formatarData(dataInput);
 
+  const ehDia24 = dataInput.endsWith("-12-24");
+
   let totalHoras = Array(9).fill(0);
   let totalExtra = 0;
   let totalGeral = 0;
@@ -166,20 +166,25 @@ function buscar() {
         });
 
         const total = horas.reduce((a,b)=>a+b,0);
-        const horasValidas = horas.filter(v => v > 0).length;
 
         // =======================
-        // 🔥 TENDÊNCIA (EXCEL)
+        // 🔥 TENDÊNCIA (AJUSTE SOMENTE DIA 24)
         // =======================
         let tendencia = 0;
-        if (horasValidas > 0) {
-          const metaDinamica = dataInput === hoje ? metaDiaDinamica() : META_DIA;
-          tendencia = Math.round((total / metaDinamica) * META_DIA);
+        if (total > 0) {
+
+          let metaUsada;
+
+          if (ehDia24) {
+            // só trabalhou até a 5ª hora
+            metaUsada = META_HORA * 5;
+          } else {
+            metaUsada = dataInput === hoje ? metaDiaDinamica() : META_DIA;
+          }
+
+          tendencia = Math.round((total / metaUsada) * META_DIA);
         }
 
-        // =======================
-        // CAPACIDADE / DESVIO (POR CÉLULA)
-        // =======================
         const capacidade = Math.round((tendencia / META_DIA) * 100);
         const desvio = tendencia - META_DIA;
 
@@ -208,11 +213,19 @@ function buscar() {
         totalGeral += total;
 
         // =======================
-        // 🔥 TENDÊNCIA GERAL (PRETA)
+        // 🔥 TENDÊNCIA GERAL (MESMA REGRA)
         // =======================
         let tendenciaGeral = 0;
         if (totalGeral > 0) {
-          const metaGeral = dataInput === hoje ? metaDiaDinamica() : META_DIA;
+
+          let metaGeral;
+
+          if (ehDia24) {
+            metaGeral = META_HORA * 5;
+          } else {
+            metaGeral = dataInput === hoje ? metaDiaDinamica() : META_DIA;
+          }
+
           tendenciaGeral = Math.round((totalGeral / metaGeral) * META_DIA);
         }
 
